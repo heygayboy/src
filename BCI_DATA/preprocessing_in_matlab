@@ -1,0 +1,34 @@
+% processing in python:
+clear; close all;clc;
+dataPath='E:\毕业设计——基于运动想象的脑机接口系统设计\BCI竞赛\BCI_Competition_II\Data from Graz\MI_data_processing';
+load('E:\毕业设计——基于运动想象的脑机接口系统设计\BCI竞赛\BCI_Competition_II\Data from Graz\dataset_BCIcomp1.mat')
+dur = 4; % time period after L/R go
+SP_filter = 'CAR';
+fs=128;
+
+dur=(3*fs+1):9*fs;
+for tr=1:140    
+    XTest(tr,:,:)=squeeze(x_test(dur,:,tr));
+    XTrain(tr,:,:)=squeeze(x_train(dur,:,tr));   %140*768*3
+end
+%% L:
+trialsL=XTrain(find(y_train==1),:,:);  %70*768*3
+for tr=1:size(trialsL,1)
+    
+    disp(['Processing trial ' num2str(tr)]);
+    psdL(tr,:,:,:) = processTrial(squeeze(trialsL(tr,:,:)), SP_filter);   %matlab中squeeze函数用于删除矩阵中的单一维（Remove singleton dimensions） 一个样本80*2048*16 传入2048*16
+end
+lpsdL = log(psdL); % 70*81*3*23
+
+
+% R
+trialsR=XTrain(find(y_train==2),:,:);  %70*768*3
+for tr=1:size(trialsR,1)
+    
+    disp(['Processing trial ' num2str(tr)]);
+    psdR(tr,:,:,:) = processTrial(squeeze(trialsR(tr,:,:)), SP_filter);   %matlab中squeeze函数用于删除矩阵中的单一维（Remove singleton dimensions） 一个样本80*2048*16 传入2048*16
+end
+lpsdR = log(psdR);% 70*81*3*23
+
+save('D:\\lpsdL.mat','lpsdL') 
+save('D:\\lpsdR.mat','lpsdR') 
